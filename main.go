@@ -14,10 +14,10 @@ import (
 var (
 	orderIDArray     []string
 	phoneNumberArray []string
-	size             string
-	qty              int
-	amount           float64
-	status           int
+	sizeArray        []string
+	qtyArray         []int
+	amountArray      []float64
+	statusArray      []int
 )
 
 const (
@@ -127,43 +127,111 @@ func validatePhoneNumber(phoneNumber string) bool {
 	return len(phoneNumber) == 10 && phoneNumber[0] == '0'
 }
 
-func placeOrder() {
-	fmt.Println("welcome to the place order Section")
-	id := generateId()
-	fmt.Println("Order ID", id)
+func validateQty(qty int) bool {
+	return qty > 0
+}
 
+func placeOrder() {
+	fmt.Println("Welcome to the Place Order Section")
+	id := generateId()
+	fmt.Println("Order ID:", id)
+
+	var phoneNumber string
 phoneNumberInput:
 	for {
-		fmt.Println("\n Enter your Phone Number")
-		input.Scan()
-		phoneNumber := input.Text()
-		isValidPhoneNumber := validatePhoneNumber(phoneNumber)
-		if isValidPhoneNumber {
-			fmt.Println("Your phone Number is ", phoneNumber)
+		fmt.Print("\nEnter your Phone Number: ")
+		_, err := fmt.Scan(&phoneNumber)
+		if err != nil {
+			fmt.Println("Error reading input:", err)
+			continue
+		}
+
+		if validatePhoneNumber(phoneNumber) {
+			fmt.Println("Your phone number is:", phoneNumber)
 			break phoneNumberInput
 		}
-		fmt.Println("Phone numer is not Valid")
-		fmt.Print("\nDo you want to enter phone number again (y/n): ")
-		input.Scan()
-		ch := input.Text()[0]
-		if ch == 'Y' || ch == 'y' {
-			continue
-		} else if ch == 'N' || ch == 'n' {
+
+		fmt.Println("Phone number is not valid")
+		fmt.Print("Do you want to enter phone number again (y/n)? ")
+
+		var choice string
+		fmt.Scan(&choice)
+		choice = strings.ToLower(choice)
+
+		if choice == "n" {
 			clearConsole()
 			homePage()
+			return
 		}
-
 	}
+
 	var shirtSize string
-	fmt.Println("Enter the T Shirt Size")
+	fmt.Print("\nEnter the T-Shirt Size (XS, S, M, L, XL, XXL): ")
 	fmt.Scan(&shirtSize)
-	fmt.Printf("you selected %v  T Shirt-Size\n", shirtSize)
+	shirtSize = strings.ToUpper(shirtSize)
+	fmt.Printf("You selected %s T-Shirt size\n", shirtSize)
 
 	var qty int
-	fmt.Println("Enter the required Quantity")
-	fmt.Scan(&qty)
-	fmt.Printf("You got %v items in that Size", qty)
+quantityInput:
+	for {
+		fmt.Print("\nEnter the required Quantity: ")
+		_, err := fmt.Scan(&qty)
+		if err != nil {
+			fmt.Println("Please enter a valid number")
+			continue
+		}
 
+		if validateQty(qty) {
+			break quantityInput
+		}
+		fmt.Println("Quantity must be greater than 0")
+	}
+
+	amount := 0.0
+	switch shirtSize {
+	case "XS":
+		amount = XS * float64(qty)
+	case "S":
+		amount = S * float64(qty)
+	case "M":
+		amount = M * float64(qty)
+	case "L":
+		amount = L * float64(qty)
+	case "XL":
+		amount = XL * float64(qty)
+	case "XXL":
+		amount = XXL * float64(qty)
+	default:
+		fmt.Println("Invalid size selected")
+		return
+	}
+
+	fmt.Printf("\nAmount: $%.2f\n", amount)
+
+	var confirm string
+	fmt.Print("\nDo you want to place this order (y/n)? ")
+	fmt.Scan(&confirm)
+	confirm = strings.ToLower(confirm)
+
+	if confirm == "y" {
+		orderIDArray = append(orderIDArray, id)
+		phoneNumberArray = append(phoneNumberArray, phoneNumber)
+		sizeArray = append(sizeArray, shirtSize)
+		qtyArray = append(qtyArray, qty)
+		amountArray = append(amountArray, amount)
+		statusArray = append(statusArray, 0)
+		fmt.Println("\nOrder Placed Successfully!")
+	}
+
+	var another string
+	fmt.Print("\nDo you want to place another order (y/n)? ")
+	fmt.Scan(&another)
+	another = strings.ToLower(another)
+
+	clearConsole()
+	if another == "n" {
+		homePage()
+	}
 }
 
 func searchCustomer() {
