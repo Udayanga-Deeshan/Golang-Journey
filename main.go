@@ -131,15 +131,38 @@ func placeOrder() {
 	fmt.Println("welcome to the place order Section")
 	id := generateId()
 	fmt.Println("Order ID", id)
-	fmt.Println("\n Enter your Phone Number")
-	input.Scan()
-	phoneNumber := input.Text()
-	isValidPhoneNumber := validatePhoneNumber(phoneNumber)
-	if isValidPhoneNumber {
-		fmt.Println("Your phone Number is ", phoneNumber)
-	} else {
+
+phoneNumberInput:
+	for {
+		fmt.Println("\n Enter your Phone Number")
+		input.Scan()
+		phoneNumber := input.Text()
+		isValidPhoneNumber := validatePhoneNumber(phoneNumber)
+		if isValidPhoneNumber {
+			fmt.Println("Your phone Number is ", phoneNumber)
+			break phoneNumberInput
+		}
 		fmt.Println("Phone numer is not Valid")
+		fmt.Print("\nDo you want to enter phone number again (y/n): ")
+		input.Scan()
+		ch := input.Text()[0]
+		if ch == 'Y' || ch == 'y' {
+			continue
+		} else if ch == 'N' || ch == 'n' {
+			clearConsole()
+			homePage()
+		}
+
 	}
+	var shirtSize string
+	fmt.Println("Enter the T Shirt Size")
+	fmt.Scan(&shirtSize)
+	fmt.Printf("you selected %v  T Shirt-Size\n", shirtSize)
+
+	var qty int
+	fmt.Println("Enter the required Quantity")
+	fmt.Scan(&qty)
+	fmt.Printf("You got %v items in that Size", qty)
 
 }
 
